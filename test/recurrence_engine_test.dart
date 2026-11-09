@@ -52,23 +52,32 @@ void main() {
       expect(wrapNext, equals(DateTime(2026, 11, 16, 10, 0)));
     });
 
-    test('Monthly recurrence with end-of-month day clamping (Jan 31 -> Feb 28)', () {
-      final currentDue = DateTime(2026, 1, 31, 12, 0);
-      const rule = RepeatRule(frequency: 'monthly', interval: 1);
+    test(
+      'Monthly recurrence with end-of-month day clamping (Jan 31 -> Feb 28)',
+      () {
+        final currentDue = DateTime(2026, 1, 31, 12, 0);
+        const rule = RepeatRule(frequency: 'monthly', interval: 1);
 
-      final next = RecurrenceEngine.computeNextDueDate(
-        currentDueDate: currentDue,
-        rule: rule,
-      );
+        final next = RecurrenceEngine.computeNextDueDate(
+          currentDueDate: currentDue,
+          rule: rule,
+        );
 
-      expect(next?.year, equals(2026));
-      expect(next?.month, equals(2));
-      expect(next?.day, equals(28)); // clamped to last day of Feb
-    });
+        expect(next?.year, equals(2026));
+        expect(next?.month, equals(2));
+        expect(next?.day, equals(28)); // clamped to last day of Feb
+      },
+    );
 
     test('After completion recurrence (3 days after task was marked done)', () {
       final currentDue = DateTime(2026, 11, 1, 10, 0);
-      final completionDate = DateTime(2026, 11, 10, 15, 0); // Completed late on 10th
+      final completionDate = DateTime(
+        2026,
+        11,
+        10,
+        15,
+        0,
+      ); // Completed late on 10th
       const rule = RepeatRule(
         frequency: 'after_completion',
         afterCompletionDays: 3,

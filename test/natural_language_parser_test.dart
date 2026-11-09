@@ -5,22 +5,25 @@ void main() {
   group('NaturalLanguageParser Tests', () {
     final refDate = DateTime(2026, 11, 10, 10, 0); // Tuesday 10:00 AM
 
-    test('Parses standard English prompt: Call Ahmed tomorrow 5pm !high #work', () {
-      final res = NaturalLanguageParser.parse(
-        'Call Ahmed tomorrow 5pm !high #work',
-        referenceDate: refDate,
-      );
+    test(
+      'Parses standard English prompt: Call Ahmed tomorrow 5pm !high #work',
+      () {
+        final res = NaturalLanguageParser.parse(
+          'Call Ahmed tomorrow 5pm !high #work',
+          referenceDate: refDate,
+        );
 
-      expect(res.title, equals('Call Ahmed'));
-      expect(res.priority, equals('high'));
-      expect(res.labels, contains('work'));
-      expect(res.hasTime, isTrue);
-      expect(res.dueAt?.year, equals(2026));
-      expect(res.dueAt?.month, equals(11));
-      expect(res.dueAt?.day, equals(11)); // Tomorrow is 11th
-      expect(res.dueAt?.hour, equals(17)); // 5pm
-      expect(res.dueAt?.minute, equals(0));
-    });
+        expect(res.title, equals('Call Ahmed'));
+        expect(res.priority, equals('high'));
+        expect(res.labels, contains('work'));
+        expect(res.hasTime, isTrue);
+        expect(res.dueAt?.year, equals(2026));
+        expect(res.dueAt?.month, equals(11));
+        expect(res.dueAt?.day, equals(11)); // Tomorrow is 11th
+        expect(res.dueAt?.hour, equals(17)); // 5pm
+        expect(res.dueAt?.minute, equals(0));
+      },
+    );
 
     test('Parses Arabic prompt: الاتصال بأحمد غداً 5 مساءً !عاجل #عمل', () {
       final res = NaturalLanguageParser.parse(

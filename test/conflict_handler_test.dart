@@ -33,34 +33,37 @@ void main() {
       expect(res.itemToArchive, isNull);
     });
 
-    test('Local wins cleanly when remote has not incremented past baseVersion', () {
-      final local = NoteConflictPayload(
-        id: 'n1',
-        title: 'Updated locally',
-        bodyDelta: 'new body',
-        version: 3,
-        updatedAt: now,
-        authorId: 'u1',
-      );
-      final remote = NoteConflictPayload(
-        id: 'n1',
-        title: 'Original',
-        bodyDelta: 'original body',
-        version: 2,
-        updatedAt: now.subtract(const Duration(hours: 1)),
-        authorId: 'u1',
-      );
+    test(
+      'Local wins cleanly when remote has not incremented past baseVersion',
+      () {
+        final local = NoteConflictPayload(
+          id: 'n1',
+          title: 'Updated locally',
+          bodyDelta: 'new body',
+          version: 3,
+          updatedAt: now,
+          authorId: 'u1',
+        );
+        final remote = NoteConflictPayload(
+          id: 'n1',
+          title: 'Original',
+          bodyDelta: 'original body',
+          version: 2,
+          updatedAt: now.subtract(const Duration(hours: 1)),
+          authorId: 'u1',
+        );
 
-      final res = ConflictHandler.resolveNoteConflict(
-        local: local,
-        remote: remote,
-        baseVersion: 2,
-      );
+        final res = ConflictHandler.resolveNoteConflict(
+          local: local,
+          remote: remote,
+          baseVersion: 2,
+        );
 
-      expect(res.winner, equals(ConflictWinner.local));
-      expect(res.winningItem.title, equals('Updated locally'));
-      expect(res.itemToArchive, isNull);
-    });
+        expect(res.winner, equals(ConflictWinner.local));
+        expect(res.winningItem.title, equals('Updated locally'));
+        expect(res.itemToArchive, isNull);
+      },
+    );
 
     test('Concurrent conflict: local is newer than remote -> local wins, remote archived', () {
       final local = NoteConflictPayload(

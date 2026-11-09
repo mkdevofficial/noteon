@@ -131,15 +131,24 @@ class NaturalLanguageParser {
     // 4. Extract relative date keywords (English & Arabic)
     final dateKeywords = [
       {
-        'keyword': RegExp(r'(?:^|\s)(today|اليوم)(?:$|\s)', caseSensitive: false),
+        'keyword': RegExp(
+          r'(?:^|\s)(today|اليوم)(?:$|\s)',
+          caseSensitive: false,
+        ),
         'days': 0,
       },
       {
-        'keyword': RegExp(r'(?:^|\s)(tomorrow|غداً|غدا)(?:$|\s)', caseSensitive: false),
+        'keyword': RegExp(
+          r'(?:^|\s)(tomorrow|غداً|غدا)(?:$|\s)',
+          caseSensitive: false,
+        ),
         'days': 1,
       },
       {
-        'keyword': RegExp(r'(?:^|\s)(بعد غد|after tomorrow)(?:$|\s)', caseSensitive: false),
+        'keyword': RegExp(
+          r'(?:^|\s)(بعد غد|after tomorrow)(?:$|\s)',
+          caseSensitive: false,
+        ),
         'days': 2,
       },
       {

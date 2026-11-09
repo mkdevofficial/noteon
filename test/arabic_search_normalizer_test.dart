@@ -38,7 +38,10 @@ void main() {
       const text = 'Finish the quarterly sprint report for mobile';
       expect(ArabicSearchNormalizer.matches(text, 'sprint report'), isTrue);
       expect(ArabicSearchNormalizer.matches(text, 'MOBILE FINISH'), isTrue);
-      expect(ArabicSearchNormalizer.matches(text, 'backend nonexisting'), isFalse);
+      expect(
+        ArabicSearchNormalizer.matches(text, 'backend nonexisting'),
+        isFalse,
+      );
     });
   });
 }

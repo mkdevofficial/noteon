@@ -1,18 +1,25 @@
-name: NoteOn Build & Release CI
+name: Build & Release Split-per-ABI APKs
 
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build & Test APK
+  build-apk:
+    name: Build Split-per-ABI APKs
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Java 17
@@ -24,28 +31,54 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
           channel: 'stable'
           cache: true
+
+      - name: Print Flutter & Dart Environment
+        run: |
+          flutter --version
+          dart --version
 
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Check Code Formatting
+      - name: Verify Code Formatting
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze Project
         run: flutter analyze
 
-      - name: Run Unit & Widget Tests
+      - name: Run Tests
         run: flutter test
 
-      - name: Build Release APKs (Split per ABI)
-        run: flutter build apk --split-per-abi
+      - name: Build Android APKs (Split per ABI)
+        run: |
+          flutter build apk --split-per-abi
 
-      - name: Upload APK Artifacts
+      - name: List Generated APKs & Checksums
+        run: |
+          echo "### Generated Split-per-ABI APKs" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size | SHA256 |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
+          cd build/app/outputs/flutter-apk
+          for apk in *.apk; do
+            if [ -f "$apk" ]; then
+              SIZE=$(ls -lh "$apk" | awk '{print $5}')
+              SHA=$(sha256sum "$apk" | awk '{print $1}')
+              echo "| \`$apk\` | $SIZE | \`${SHA:0:16}...\` |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Upload Split-per-ABI APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-apks
-          path: build/app/outputs/flutter-apk/*.apk
+          name: split-per-abi-apks
+          path: build/app/outputs/flutter-apk/app-*-release.apk
           retention-days: 14
+
+      - name: Create GitHub Release (Tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/app/outputs/flutter-apk/app-*-release.apk
+          generate_release_notes: true
